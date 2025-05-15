@@ -69,7 +69,9 @@ with tab1:
     wine_type = st.radio("Tipo de vino", ["Rojo", "Blanco"])
     input_data = {}
     for col in wine_df.columns[:-2]:
-        input_data[col] = st.number_input(col, min_value=0.0, step=0.1)
+        min_val = float(wine_df[col].min())
+        max_val = float(wine_df[col].max())
+        input_data[col] = st.number_input(col, min_value=min_val, max_value=max_val, step=0.1, value=(min_val + max_val)/2)
     if st.button("Predecir calidad del vino"):
         features = pd.DataFrame([input_data])
         features["type"] = 0 if wine_type == "Rojo" else 1
@@ -80,7 +82,9 @@ with tab2:
     st.header("Clasificación de tumor")
     input_cancer = {}
     for feat in cancer_features:
-        input_cancer[feat] = st.number_input(f"{feat.replace('_', ' ').capitalize()}", min_value=0.0, step=0.1)
+        min_val = float(cancer_df[[f"feature_{i}" for i in range(2, 32)]].rename(columns=lambda x: x.replace("feature_", "")).astype(float)[feat].min())
+        max_val = float(cancer_df[[f"feature_{i}" for i in range(2, 32)]].rename(columns=lambda x: x.replace("feature_", "")).astype(float)[feat].max())
+        input_cancer[feat] = st.number_input(f"{feat.replace('_', ' ').capitalize()}", min_value=min_val, max_value=max_val, step=0.1, value=(min_val + max_val)/2)
     if st.button("Clasificar tumor"):
         features = pd.DataFrame([input_cancer])
         prediction = cancer_model.predict(features)[0]
